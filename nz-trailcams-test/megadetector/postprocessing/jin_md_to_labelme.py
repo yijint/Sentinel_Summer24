@@ -34,7 +34,7 @@ default_confidence_threshold = 0.15
 
 #%% Functions
 
-def get_labelme_dict_for_image(im,image_base_name=None,category_id_to_name=None,
+def get_labelme_dict_for_image(im,image_base_name=None,use_custom_labels=False,category_id_to_name=None,
                                info=None,confidence_threshold=None):
     """
     For the given image struct in MD results format, reformat the detections into
@@ -54,7 +54,6 @@ def get_labelme_dict_for_image(im,image_base_name=None,category_id_to_name=None,
     Return:
         dict: labelme-formatted dictionary, suitable for writing directly to a labelme-formatted .json file
     """
-    
     if image_base_name is None:
         image_base_name = os.path.basename(im['file'])
         
@@ -71,6 +70,7 @@ def get_labelme_dict_for_image(im,image_base_name=None,category_id_to_name=None,
     output_dict['flags'] = {}
     output_dict['shapes'] = []
     output_dict['imagePath'] = image_base_name
+    output_dict['filename'] = im['file'] # added for conversion from labelme to dataload pipeline 
     output_dict['imageHeight'] = im['height']
     output_dict['imageWidth'] = im['width']
     output_dict['imageData'] = None
@@ -84,8 +84,11 @@ def get_labelme_dict_for_image(im,image_base_name=None,category_id_to_name=None,
         
         shape = {}
         shape['conf'] = det['conf']
-        # shape['label'] = category_id_to_name[det['category']] 
-        shape['label'] = im['file'].split('/')[-2] # retrieve species from file path, assuming structure of NZ trailcam dataset 
+        if not use_custom_labels:
+            shape['label'] = category_id_to_name[det['category']] # original method using MD outputs (animal, people, vehicle)
+        else: # custom labels  
+            shape['label'] = det['custom_label'] # retrieve species label from metadata, generated in pipeline.ipynb
+            # shape['label'] = im['file'].split('/')[-2] # retrieve species from file path, assuming structure of NZ trailcam dataset 
         shape['shape_type'] = 'rectangle'
         shape['description'] = ''
         shape['group_id'] = None
@@ -108,9 +111,8 @@ def get_labelme_dict_for_image(im,image_base_name=None,category_id_to_name=None,
 
 
 def _write_output_for_image(im,image_base,extension_prefix,info,
-                            confidence_threshold,category_id_to_name,overwrite,
+                            confidence_threshold,category_id_to_name,overwrite,use_custom_labels=False,
                             verbose=False):
-    
     if 'failure' in im and im['failure'] is not None:
         assert 'detections' not in im or im['detections'] is None
         if verbose:
@@ -128,6 +130,7 @@ def _write_output_for_image(im,image_base,extension_prefix,info,
 
     output_dict = get_labelme_dict_for_image(im,
                                              image_base_name=os.path.basename(im_full_path),
+                                             use_custom_labels=use_custom_labels,
                                              category_id_to_name=category_id_to_name,
                                              info=info,
                                              confidence_threshold=confidence_threshold)
@@ -139,7 +142,7 @@ def _write_output_for_image(im,image_base,extension_prefix,info,
 
 
 
-def md_to_labelme(results_file,image_base,confidence_threshold=None,
+def md_to_labelme(results_file,image_base,use_custom_labels=False,confidence_threshold=None,
                   overwrite=False,extension_prefix='',n_workers=1,
                   use_threads=False,bypass_image_size_read=False,
                   verbose=False):
@@ -164,7 +167,6 @@ def md_to_labelme(results_file,image_base,confidence_threshold=None,
             the MD results file (don't set this to "True" if your MD results file doesn't contain image sizes)
         verbose (bool, optional): enables additionald ebug output    
     """
-    
     if extension_prefix is None:
         extension_prefix = ''
         
@@ -225,7 +227,9 @@ def md_to_labelme(results_file,image_base,confidence_threshold=None,
     if n_workers <= 1:
         for im in tqdm(md_results['images']):    
             _write_output_for_image(im,image_base,extension_prefix,md_results['info'],confidence_threshold,
-                                   md_results['detection_categories'],overwrite,verbose)
+                                   md_results['detection_categories'],overwrite,
+                                   use_custom_labels,
+                                   verbose)
     else:
         if use_threads:
             print('Starting parallel thread pool with {} workers'.format(n_workers))
@@ -238,7 +242,7 @@ def md_to_labelme(results_file,image_base,confidence_threshold=None,
                         image_base=image_base,extension_prefix=extension_prefix,
                         info=md_results['info'],confidence_threshold=confidence_threshold,
                         category_id_to_name=md_results['detection_categories'],
-                        overwrite=overwrite,verbose=verbose),
+                        overwrite=overwrite,use_custom_labels=use_custom_labels,verbose=verbose),
                  md_results['images']),
                  total=len(md_results['images'])))
             
