@@ -1,0 +1,33 @@
+dataset:
+    index                                 bb_id  ... loc_index location_id
+0    None  9dd08c0e-2336-4629-9226-d773654b2048  ...      None    ACC_T006
+1    None  1277a1bc-42a1-4fa4-ae2e-b036a53c37ab  ...      None    ACC_T006
+2    None  eabc4ad9-3e68-46dc-80a9-33a63eca28a6  ...      None    ACC_T006
+3    None  bf1693dd-a232-4888-9148-997218172b34  ...      None    ACC_T006
+4    None  cbc7665c-4012-4ac7-b386-79fd4d13037a  ...      None    ACC_T006
+..    ...                                   ...  ...       ...         ...
+103  None  51bf3464-75ad-4fd6-8a9d-461a726b5d9d  ...      None    ACC_T006
+104  None  8baf1552-7815-43ba-9331-94b3d7aec343  ...      None    ACC_T006
+105  None  27870c42-83bb-422d-91a5-2154045bd922  ...      None    ACC_T006
+106  None  4bdc2d85-a39f-4f45-ae8d-c379c95845b3  ...      None    ACC_T006
+107  None  d3711c75-5339-48e1-955d-44ac0f06faed  ...      None    ACC_T006
+
+[108 rows x 43 columns]
+==========================================================
+Dataeset deleted
+==========================================================
+dataset:
+    index                                 bb_id  ... loc_index location_id
+0    None  9dd08c0e-2336-4629-9226-d773654b2048  ...      None    ACC_T006
+1    None  1277a1bc-42a1-4fa4-ae2e-b036a53c37ab  ...      None    ACC_T006
+2    None  eabc4ad9-3e68-46dc-80a9-33a63eca28a6  ...      None    ACC_T006
+3    None  bf1693dd-a232-4888-9148-997218172b34  ...      None    ACC_T006
+4    None  cbc7665c-4012-4ac7-b386-79fd4d13037a  ...      None    ACC_T006
+..    ...                                   ...  ...       ...         ...
+103  None  51bf3464-75ad-4fd6-8a9d-461a726b5d9d  ...      None    ACC_T006
+104  None  8baf1552-7815-43ba-9331-94b3d7aec343  ...      None    ACC_T006
+105  None  27870c42-83bb-422d-91a5-2154045bd922  ...      None    ACC_T006
+106  None  4bdc2d85-a39f-4f45-ae8d-c379c95845b3  ...      None    ACC_T006
+107  None  d3711c75-5339-48e1-955d-44ac0f06faed  ...      None    ACC_T006
+
+[108 rows x 43 columns]
