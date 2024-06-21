@@ -70,12 +70,14 @@ def get_labelme_dict_for_image(im,image_base_name=None,use_custom_labels=False,c
     output_dict['flags'] = {}
     output_dict['shapes'] = []
     output_dict['imagePath'] = image_base_name
-    output_dict['filename'] = im['file'] # added for conversion from labelme to dataload pipeline 
     output_dict['imageHeight'] = im['height']
     output_dict['imageWidth'] = im['width']
     output_dict['imageData'] = None
     output_dict['detections'] = im['detections']
-    
+
+    # additional variables 
+    output_dict['filename'] = im['file'] # added for conversion from labelme to dataload pipeline 
+        
     # det = im['detections'][1]
     for det in im['detections']:
         
