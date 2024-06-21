@@ -1,4 +1,3 @@
-dataset:
     index                                 bb_id  ... loc_index location_id
 0    None  9dd08c0e-2336-4629-9226-d773654b2048  ...      None    ACC_T006
 1    None  1277a1bc-42a1-4fa4-ae2e-b036a53c37ab  ...      None    ACC_T006
@@ -16,7 +15,6 @@ dataset:
 ==========================================================
 Dataeset deleted
 ==========================================================
-dataset:
     index                                 bb_id  ... loc_index location_id
 0    None  9dd08c0e-2336-4629-9226-d773654b2048  ...      None    ACC_T006
 1    None  1277a1bc-42a1-4fa4-ae2e-b036a53c37ab  ...      None    ACC_T006
