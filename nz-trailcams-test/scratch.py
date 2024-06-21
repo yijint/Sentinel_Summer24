@@ -15,9 +15,8 @@ URL = f'mysql+pymysql://{db_user}:{db_pass}@{db_ip}/{db_name}'
 # read dataset
 def print_dataset():
     engine = sqlalchemy.create_engine(URL, pool_size=5, max_overflow=2, pool_timeout=30, pool_recycle=1800)
-    openesc, closeesc = '', '' # escape column names
     query = f'SELECT * FROM images.{TABLE_NAME}'
-    query += f' WHERE {openesc}dataset{closeesc} = "{DATASET_NAME}"'
+    query += f' WHERE dataset = "{DATASET_NAME}"'
     db_df = pd.read_sql(query, con=engine)
     return db_df
 
@@ -25,9 +24,8 @@ def print_dataset():
 def delete_dataset():
     engine = sqlalchemy.create_engine(URL, pool_size=5, max_overflow=2, pool_timeout=30, pool_recycle=1800)
     with engine.connect() as connection:
-        openesc, closeesc = '', '' # escape column names
         query = f'DELETE FROM images.{TABLE_NAME}'
-        query += f' WHERE {openesc}dataset{closeesc} = "{DATASET_NAME}"'
+        query += f' WHERE dataset = "{DATASET_NAME}"'
         connection.execute(sqlalchemy.text(query))
 
 # test
