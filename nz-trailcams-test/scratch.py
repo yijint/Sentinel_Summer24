@@ -19,19 +19,21 @@ def print_dataset():
     query += f' WHERE dataset = "{DATASET_NAME}"'
     db_df = pd.read_sql(query, con=engine)
     return db_df
-# delete data
+
+# delete dataset
 def delete_dataset():
     with engine.connect() as connection:
         query = f'DELETE FROM images.{TABLE_NAME}'
         query += f' WHERE dataset = "{DATASET_NAME}"'
         connection.execute(sqlalchemy.text(query))
+        connection.commit()
 
 # test
 with open("scratch.txt", 'w') as f:
     print(print_dataset(), file = f, flush=True)
     print("==========================================================", file = f, flush=True)
     try:
-        delete_dataset()
+        # delete_dataset()
         print("Dataeset deleted", file = f, flush=True)
     except Exception as ex:
         print(f"Deletion failed: {ex}", file = f, flush=True)
