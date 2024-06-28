@@ -14,6 +14,8 @@ import time
 import pandas as pd
 import uuid
 import argparse
+import sqlalchemy
+import random
 
 import humanfriendly
 
@@ -948,3 +950,59 @@ def post_rde(input_path,
     if verbose: print('Done')
 
     return filtered_output_filename
+
+def upload_db(df, dataset_name, table_name):
+    '''
+    Upload the given dataset to the database under dataset_name.
+
+    Args:
+        df (pandas dataframe): dataset data (as produced by the preprocessing notebooks)
+        dataset_name (str): value for the 'dataset' column in the database 
+    '''
+    # Database credentials and settings
+    db_user = 'dataprep'
+    db_pass = 'sdK77:+,^^g[+rbV'
+    db_name = 'images'
+    db_ip   = '127.0.0.1:2235'  # Corrected IP address
+
+    # Connection URL
+    URL = f'mysql+pymysql://{db_user}:{db_pass}@{db_ip}/{db_name}'
+
+    # Create the SQLAlchemy engine
+    engine = sqlalchemy.create_engine(URL, pool_size=5, max_overflow=2, pool_timeout=30, pool_recycle=1800)
+
+    # Update the given dataset name
+    df['dataset'] = dataset_name
+
+    # Upload to database 
+    chunksize = 100000
+    for i in tqdm(range(0, len(df), chunksize)):
+        while 1:
+            try:
+                df.iloc[i:i+chunksize].to_sql(table_name, con=engine, if_exists='append', index=False)
+                break
+            except Exception as e:
+                print(e)
+
+def read_db(dataset_name, table_name):
+    random.seed(42)
+
+    # Database credentials and settings
+    db_user = 'dataprep'
+    db_pass = 'sdK77:+,^^g[+rbV'
+    db_name = 'images'
+    db_ip   = '127.0.0.1:2235'  # Corrected IP address
+
+    # Connection URL
+    URL = f'mysql+pymysql://{db_user}:{db_pass}@{db_ip}/{db_name}'
+
+    # Create the SQLAlchemy engine
+    engine = sqlalchemy.create_engine(URL, pool_size=5, max_overflow=2, pool_timeout=30, pool_recycle=1800)
+    print('Engine Created')
+
+    # Retrieve and return the dataset
+    openesc, closeesc = '', '' # escape column names
+    query = f'SELECT * FROM images.{table_name}'
+    query += f' WHERE {openesc}dataset{closeesc} = "{dataset_name}"'
+
+    return pd.read_sql(query, con=engine)
