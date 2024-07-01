@@ -42,7 +42,7 @@ from megadetector.postprocessing.postprocess_batch_results import PostProcessing
 from megadetector.postprocessing.repeat_detection_elimination import repeat_detections_core
 from megadetector.postprocessing.repeat_detection_elimination import remove_repeat_detections
 
-def mdv5a_and_rde(input_path, job_name, job_date, postprocessing_base
+def mdv5a_and_rde(input_path, job_name, job_date, postprocessing_base,
                 run_md_automatically=True, n_jobs=1, n_gpus=1, default_gpu_number=0, ncores=1,
                 verbose = False):
     '''
