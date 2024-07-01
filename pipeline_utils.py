@@ -42,42 +42,45 @@ from megadetector.postprocessing.postprocess_batch_results import PostProcessing
 from megadetector.postprocessing.repeat_detection_elimination import repeat_detections_core
 from megadetector.postprocessing.repeat_detection_elimination import remove_repeat_detections
 
-def mdv5a_and_rde(input_path, job_name, job_date,
+def mdv5a_and_rde(input_path, job_name, job_date, postprocessing_base
                 run_md_automatically=True, n_jobs=1, n_gpus=1, default_gpu_number=0, ncores=1,
                 verbose = False):
     '''
     Run MDv5a and RDE on the given dataset at input_path. 
 
     Args:
-        input_path (str): Path to data folder, e.g., '/home/user/data'
-        job_name (str): A short name for this job, e.g. 'nz-trailcams'
-        job_date (str): Date of running this job, e.g. '2024-jun-07'
-        run_md_automatically (bool): Whether to run megadetector automatically; if False, 
-                                    scripts have to be run manually from the terminal.
-                                    If True, there will be no parallelization over multiple 
-                                    processes, so the tasks will run serially. 
-                                    This only matters if you have multiple GPUs. 
-        n_jobs (int): Number of jobs to split data into, typically equal to the number of 
-                    available GPUs though when using augmentation or an image queue (and thus 
-                    not using checkpoints), Dan Morris typically uses ~100 jobs per GPU; 
-                    those serve as de facto checkpoints.
-        n_gpus (int): Number of available GPUs
-        default_gpu_number (int): Only relevant for single-GPU usage
-        ncores (int): Number of cores available; only relevant when running on CPU
-        verbose (bool): Whether to print job details 
+        input_path (str):               Path to data folder, e.g., '/home/user/data'
+        job_name (str):                 A short name for this job, e.g. 'nz-trailcams'
+        job_date (str):                 Date of running this job, e.g. '2024-jun-07'
+        postprocessing_base (str):      Path to the desired postprocessing folder. 
+                                        This folder does not have to exist.
+        run_md_automatically (bool):    Whether to run megadetector automatically; if False, 
+                                        scripts have to be run manually from the terminal.
+                                        If True, there will be no parallelization over multiple 
+                                        processes, so the tasks will run serially. 
+                                        This only matters if you have multiple GPUs. 
+        n_jobs (int):                   Number of jobs to split data into, typically equal to 
+                                        the number of available GPUs though when using augmentation 
+                                        or an image queue (and thus not using checkpoints), 
+                                        Dan Morris typically uses ~100 jobs per GPU; 
+                                        those serve as de facto checkpoints.
+        n_gpus (int):                   Number of available GPUs
+        default_gpu_number (int):       Only relevant for single-GPU usage
+        ncores (int):                   Number of cores available; only relevant when running on CPU
+        verbose (bool):                 Whether to print job details 
     
     NOTE: 
     the user does not have to understand what the outputs are, they can be fed directly as arguments
     to post_rde(), also defined in this script. 
 
     Return: 
-        combined_api_output_file (str): filepath to megedetection results on the whole dataset 
-        rde_string (str): string containing rde settings 
-        suspicious_detection_results (object): repeat detection results 
-        default_workers_for_parallel_tasks (int): settings for image rendering
-        parallelization_defaults_to_threads (bool): prefer threads on Windows, processes on Linux
-        postprocessing_output_folder (str): folder path to filtered output 
-        base_task_name (str): naming conventions 
+        combined_api_output_file (str):             Filepath to megedetection results on the whole dataset 
+        rde_string (str):                           String containing rde settings 
+        suspicious_detection_results (object):      Repeat detection results 
+        default_workers_for_parallel_tasks (int):   Settings for image rendering
+        parallelization_defaults_to_threads (bool): Prefer threads on Windows, processes on Linux
+        postprocessing_output_folder (str):         Folder path to filtered output 
+        base_task_name (str):                       Naming conventions 
     '''
 
     if verbose:
@@ -85,6 +88,7 @@ def mdv5a_and_rde(input_path, job_name, job_date,
         print(f"job_name: {job_name}", flush=True)
         print(f"job_date: {job_date}", flush=True)
         print(f"input_path: {input_path}", flush=True)
+        print(f"postprocessing_base: {postprocessing_base}", flush=True)
         print(flush=True)
         print(f"n_jobs: {n_jobs}", flush=True)
         print(f"n_gpus: {n_gpus}", flush=True)
@@ -214,9 +218,6 @@ def mdv5a_and_rde(input_path, job_name, job_date,
         job_description_string = '-' + job_tag
 
     model_file = 'MDV5A' # 'MDV5A', 'MDV5B', 'MDV4'
-
-    postprocessing_base = f"{os.getcwd()}/postprocessing"
-    if verbose: print(f"postprocessing_base: {postprocessing_base}", flush=True)
 
     # Set to "None" when using augmentation or an image queue, which don't currently support
     # checkpointing.  Don't worry, this will be assert()'d in the next cell.
@@ -887,18 +888,19 @@ def post_rde(input_path,
     are - they are the outputs returned by mdv5a_and_rde(), also defined in this script. 
 
     Args:
-        input_path (str): Path to data folder, e.g., '/home/user/data'
-        combined_api_output_file (str): filepath to megedetection results on the whole dataset 
-        rde_string (str): string containing rde settings 
-        suspicious_detection_results (object): repeat detection results 
-        default_workers_for_parallel_tasks (int): settings for image rendering
-        parallelization_defaults_to_threads (bool): prefer threads on Windows, processes on Linux
-        postprocessing_output_folder (str): folder path to filtered output 
-        base_task_name (str): naming conventions 
-        verbose (bool): Whether to print job details 
+        input_path (str):                           Path to data folder, e.g., '/home/user/data'
+        combined_api_output_file (str):             Filepath to megedetection results on the whole 
+                                                    dataset 
+        rde_string (str):                           String containing rde settings 
+        suspicious_detection_results (object):      Repeat detection results 
+        default_workers_for_parallel_tasks (int):   Settings for image rendering
+        parallelization_defaults_to_threads (bool): Prefer threads on Windows, processes on Linux
+        postprocessing_output_folder (str):         Folder path to filtered output 
+        base_task_name (str):                       Naming conventions 
+        verbose (bool):                             Whether to print job details 
 
     Return: 
-        filtered_output_filename (str): path to the output file
+        filtered_output_filename (str):             Path to the output file
     '''
 
     filtered_output_filename = path_utils.insert_before_extension(combined_api_output_file,
@@ -953,11 +955,11 @@ def post_rde(input_path,
 
 def upload_db(df, dataset_name, table_name):
     '''
-    Upload the given dataset to the database under dataset_name.
+    Upload the given dataset to the images_v3 database under dataset_name.
 
     Args:
-        df (pandas dataframe): dataset data (as produced by the preprocessing notebooks)
-        dataset_name (str): value for the 'dataset' column in the database 
+        df (pandas dataframe):  Dataset data (as produced by the preprocessing notebooks)
+        dataset_name (str):     Value for the 'dataset' column in the database 
     '''
     # Database credentials and settings
     db_user = 'dataprep'
@@ -985,6 +987,13 @@ def upload_db(df, dataset_name, table_name):
                 print(e)
 
 def read_db(dataset_name, table_name):
+    '''
+    From the images_v3 database, read dataset under dataset_name and table_name.
+
+    Args:
+        dataset_name (str): Value for the 'dataset' column in the database 
+        table_name (str):   Name of table in the database 
+    '''
     random.seed(42)
 
     # Database credentials and settings
